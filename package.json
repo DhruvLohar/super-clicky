@@ -10,9 +10,13 @@
     "tauri": "tauri"
   },
   "dependencies": {
+    "@elevenlabs/elevenlabs-js": "^2.43.0",
+    "@google/genai": "^1.50.1",
     "@tailwindcss/vite": "^4.2.2",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-opener": "^2",
+    "dotenv": "^17.4.2",
+    "mime": "^4.1.0",
     "motion": "^12.38.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -22,6 +26,7 @@
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2",
+    "@types/node": "^25.6.0",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.6.0",
