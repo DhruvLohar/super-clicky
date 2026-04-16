@@ -6,6 +6,14 @@ body {
   @apply m-0 p-0 !bg-transparent;
 }
 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.recording-spin {
+  animation: spin 1s linear infinite;
+}
+
 /* Cursor glow — radial gradient + multi-shadow not expressible as utilities */
 .cursor-glow {
   background: radial-gradient(
@@ -16,9 +24,3 @@ body {
   );
 }
 
-/* Dock glass — complex multi-shadow */
-.dock-glass {
-  box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}

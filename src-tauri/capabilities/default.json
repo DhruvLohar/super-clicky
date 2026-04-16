@@ -5,6 +5,7 @@
   "windows": ["dock", "cursor_window"],
   "permissions": [
     "core:default",
-    "opener:default"
+    "opener:default",
+    "global-shortcut:default"
   ]
 }

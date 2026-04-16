@@ -1,43 +1,58 @@
-import { useState, memo } from "react";
+import { memo, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import { useDockStore } from "./stores/dockStore";
 
 function Dock() {
-  const [isVisible, setIsVisible] = useState(true);
+  const isHovered = useDockStore((s) => s.isHovered);
+  const setHovered = useDockStore((s) => s.setHovered);
+  const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleEnter = useCallback(() => {
+    if (leaveTimer.current) clearTimeout(leaveTimer.current);
+    setHovered(true);
+  }, [setHovered]);
+
+  const handleLeave = useCallback(() => {
+    leaveTimer.current = setTimeout(() => setHovered(false), 200);
+  }, [setHovered]);
 
   return (
-    <div className="flex h-screen w-screen flex-col items-center justify-end overflow-hidden bg-transparent">
-      <motion.button
-        className="cursor-pointer rounded-t-lg border border-white/15 bg-white/10 px-4 py-0.5 text-[10px] text-white/70 shadow-none backdrop-blur-[10px] hover:border-transparent hover:bg-white/20"
-        onClick={() => setIsVisible((v) => !v)}
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
+    <div className="flex h-screen w-screen items-center justify-end overflow-hidden bg-transparent pointer-events-none">
+      <div
+        className="flex items-center pointer-events-auto"
+        onMouseEnter={handleEnter}
+        onMouseLeave={handleLeave}
       >
-        {isVisible ? "▼" : "▲"}
-      </motion.button>
+        <AnimatePresence>
+          {isHovered && (
+            <motion.div
+              className="mr-3 rounded-full bg-[#18191b] px-4 py-2.5 text-white pointer-events-auto"
+              style={{ fontSize: 16, whiteSpace: "nowrap" }}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              onMouseEnter={handleEnter}
+              onMouseLeave={handleLeave}
+            >
+              Hold{" "}
+              <span className="text-[#f7a76e]">ctrl + alt</span>
+              {" "}to ask your doubt,{" "}
+              <span className="text-[#f7a76e]">ctrl + shift</span>
+              {" "}to exit
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-      <AnimatePresence>
-        {isVisible && (
-          <motion.div
-            className="dock-glass mb-1.5 flex items-center justify-center gap-3 rounded-2xl border border-white/18 bg-white/12 px-6 py-2.5 backdrop-blur-[20px]"
-            initial={{ y: 80, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: 80, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          >
-            {["🚀", "⚡", "🎯"].map((icon) => (
-              <motion.button
-                key={icon}
-                className="flex size-12 cursor-pointer items-center justify-center rounded-xl border-none bg-white/15 p-0 text-[22px] text-white shadow-md backdrop-blur-[10px] transition-colors duration-200 hover:border-transparent hover:bg-white/25"
-                whileHover={{ scale: 1.2, y: -8 }}
-                whileTap={{ scale: 0.9 }}
-                transition={{ type: "spring", stiffness: 400, damping: 15 }}
-              >
-                {icon}
-              </motion.button>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
+        <motion.div
+          className="rounded-full border border-[#793606] bg-[#301602] w-2"
+          animate={{
+            height: isHovered ? 44 : 96,
+            opacity: isHovered ? 0.8 : 0.5,
+          }}
+          transition={{ type: "spring", stiffness: 300, damping: 28 }}
+        />
+      </div>
     </div>
   );
 }

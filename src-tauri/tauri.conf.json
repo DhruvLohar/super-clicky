@@ -14,16 +14,15 @@
       {
         "label": "dock",
         "title": "Dock",
-        "width": 600,
-        "height": 80,
+        "width": 550,
+        "height": 120,
         "url": "/dock",
         "decorations": false,
         "transparent": true,
         "alwaysOnTop": true,
         "resizable": false,
         "shadow": false,
-        "skipTaskbar": true,
-        "center": true
+        "skipTaskbar": true
       },
       {
         "label": "cursor_window",
