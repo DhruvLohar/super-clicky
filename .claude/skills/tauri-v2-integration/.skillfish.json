@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "name": "tauri-v2-integration",
+  "owner": "xiaolai",
+  "repo": "vmark",
+  "path": ".claude/skills/tauri-v2-integration",
+  "branch": "main",
+  "sha": "742223c2adb49061fe53cd1563d70f6594445dd4",
+  "source": "manual"
+}
