@@ -15,7 +15,7 @@
         "label": "dock",
         "title": "Dock",
         "width": 550,
-        "height": 120,
+        "height": 600,
         "url": "/dock",
         "decorations": false,
         "transparent": true,

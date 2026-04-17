@@ -28,4 +28,5 @@ screenshots = "0.8"
 rodio = "0.19"
 cpal = "0.15"
 hound = "3.5"
+base64 = "0.22"
 
