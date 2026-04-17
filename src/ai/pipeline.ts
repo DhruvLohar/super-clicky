@@ -22,7 +22,7 @@ export function startPipelineListener(): () => void {
 
   listen<ProcessQueryPayload>("process-query", async (event) => {
     const { audioPath, screenshotPath } = event.payload;
-    const { openPanel, appendText } = useDockStore.getState();
+    const { openPanel, appendText, setUserQuery } = useDockStore.getState();
 
     try {
       openPanel();
@@ -40,14 +40,13 @@ export function startPipelineListener(): () => void {
       const audioBytes = base64ToUint8Array(audioBase64);
       const audioBlob = new Blob([audioBytes], { type: "audio/wav" });
 
-      appendText("Transcribing audio...\n");
       console.log("[pipeline] Calling speechToText...");
 
       const { speechToText } = await import("./speechToText");
       const transcription = await speechToText(audioBlob);
 
       console.log("[pipeline] Transcription result:", transcription.slice(0, 100), transcription.length > 100 ? "..." : "");
-      appendText("\n---\n");
+      setUserQuery(transcription);
 
       console.log("[pipeline] Calling Gemini LLM...");
       const { explainWithScreenshot } = await import("./geminiLLM");
