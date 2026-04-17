@@ -13,7 +13,7 @@ let listenerActive = false;
 let activeAudioSource: AudioBufferSourceNode | null = null;
 let activeAudioContext: AudioContext | null = null;
 
-function stopAudio(): void {
+export function stopAudio(): void {
   if (activeAudioSource) {
     try {
       activeAudioSource.stop();
@@ -26,6 +26,7 @@ function stopAudio(): void {
     activeAudioContext.close().catch(() => {});
     activeAudioContext = null;
   }
+  useDockStore.getState().setSpeaking(false);
 }
 
 function base64ToUint8Array(base64: string): Uint8Array {
@@ -139,9 +140,11 @@ export function startPipelineListener(): () => void {
         activeAudioSource = null;
         activeAudioContext?.close().catch(() => {});
         activeAudioContext = null;
+        useDockStore.getState().setSpeaking(false);
       };
 
       source.start(0);
+      useDockStore.getState().setSpeaking(true);
       console.log("[audio] Playback started");
 
     } catch (err) {

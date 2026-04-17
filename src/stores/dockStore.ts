@@ -9,6 +9,8 @@ interface DockState {
   isHovered: boolean;
   setHovered: (h: boolean) => void;
   isOpen: boolean;
+  isSpeaking: boolean;
+  setSpeaking: (v: boolean) => void;
   messages: Message[];
   userQuery: string;
   streamedText: string;
@@ -23,6 +25,8 @@ export const useDockStore = create<DockState>((set) => ({
   isHovered: false,
   setHovered: (isHovered) => set({ isHovered }),
   isOpen: false,
+  isSpeaking: false,
+  setSpeaking: (isSpeaking) => set({ isSpeaking }),
   messages: [],
   userQuery: "",
   streamedText: "",

@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import ReactMarkdown from "react-markdown";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useDockStore } from "./stores/dockStore";
+import { stopAudio } from "./ai/pipeline";
 import Logo from "./assets/Logo.webp";
 
 const mdComponents = {
@@ -30,6 +31,7 @@ const mdComponents = {
 function StreamPanel() {
   const messages = useDockStore((s) => s.messages);
   const streamedText = useDockStore((s) => s.streamedText);
+  const isSpeaking = useDockStore((s) => s.isSpeaking);
   const closePanel = useDockStore((s) => s.closePanel);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -108,6 +110,16 @@ function StreamPanel() {
                   </div>
                 </div>
               ) : null}
+
+              {/* Stop speaking button */}
+              {i === messages.length - 1 && msg.response && isSpeaking && (
+                <button
+                  onClick={stopAudio}
+                  className="text-[#61656b] hover:text-white text-[11px] transition-colors mt-1"
+                >
+                  Stop speaking
+                </button>
+              )}
 
               {/* Divider between messages */}
               {i < messages.length - 1 && (
