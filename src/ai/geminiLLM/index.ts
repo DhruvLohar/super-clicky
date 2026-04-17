@@ -1,11 +1,8 @@
 import { GoogleGenAI } from "@google/genai";
 import SYSTEM_PROMPT from "./prompt";
 
-// import dotenv from "dotenv";
-// dotenv.config();
-
 const ai = new GoogleGenAI({
-  apiKey: "", // process.env.GOOGLE_API_KEY!
+  apiKey: import.meta.env.VITE_GOOGLE_API_KEY,
   httpOptions: { timeout: 120_000 },
 });
 

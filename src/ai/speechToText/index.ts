@@ -1,9 +1,7 @@
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
-// import dotenv from "dotenv";
-// dotenv.config();
 
 const elevenlabs = new ElevenLabsClient({
-  apiKey: ""//process.env.ELEVENLABS_API_KEY!,
+  apiKey: import.meta.env.VITE_ELEVENLABS_API_KEY,
 });
 
 export async function speechToText(audioBlob: Blob): Promise<string> {

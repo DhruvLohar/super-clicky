@@ -1,20 +1,48 @@
-import { memo, useRef, useEffect } from "react";
+import { memo, useRef, useEffect, useCallback } from "react";
 import { motion } from "motion/react";
 import ReactMarkdown from "react-markdown";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useDockStore } from "./stores/dockStore";
 import Logo from "./assets/Logo.webp";
 
+const mdComponents = {
+  p: ({ children }: any) => <p className="mb-2 last:mb-0">{children}</p>,
+  h1: ({ children }: any) => <h1 className="text-[16px] font-bold mb-2">{children}</h1>,
+  h2: ({ children }: any) => <h2 className="text-[15px] font-semibold mb-2">{children}</h2>,
+  h3: ({ children }: any) => <h3 className="text-[14px] font-semibold mb-1">{children}</h3>,
+  ul: ({ children }: any) => <ul className="list-disc pl-4 mb-2">{children}</ul>,
+  ol: ({ children }: any) => <ol className="list-decimal pl-4 mb-2">{children}</ol>,
+  li: ({ children }: any) => <li className="mb-0.5">{children}</li>,
+  code: ({ children, className }: any) =>
+    className ? (
+      <code className="block bg-[#0d0e0f] rounded-[6px] px-3 py-2 text-[13px] font-mono overflow-x-auto mb-2">{children}</code>
+    ) : (
+      <code className="bg-[#0d0e0f] rounded-[3px] px-1 text-[13px] font-mono">{children}</code>
+    ),
+  pre: ({ children }: any) => <pre className="mb-2">{children}</pre>,
+  strong: ({ children }: any) => <strong className="font-semibold">{children}</strong>,
+  em: ({ children }: any) => <em className="italic">{children}</em>,
+  blockquote: ({ children }: any) => (
+    <blockquote className="border-l-2 border-[#61656b] pl-3 text-[#9ca3af] mb-2">{children}</blockquote>
+  ),
+};
+
 function StreamPanel() {
-  const userQuery = useDockStore((s) => s.userQuery);
+  const messages = useDockStore((s) => s.messages);
   const streamedText = useDockStore((s) => s.streamedText);
   const closePanel = useDockStore((s) => s.closePanel);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const enableClick = useCallback(() => getCurrentWindow().setIgnoreCursorEvents(false), []);
+  const disableClick = useCallback(() => getCurrentWindow().setIgnoreCursorEvents(true), []);
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [streamedText]);
+
+  const isLastStreaming = messages.length > 0 && messages[messages.length - 1].response === "" ;
 
   return (
     <motion.div
@@ -24,9 +52,11 @@ function StreamPanel() {
       exit={{ opacity: 0, x: 40, scale: 0.97 }}
       transition={{ duration: 0.22, ease: "easeOut" }}
       style={{ maxHeight: 540 }}
+      onMouseEnter={enableClick}
+      onMouseLeave={disableClick}
     >
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 bg-[#18191b] shrink-0">
+      <div className="flex items-center justify-between px-4 py-2.5 bg-[#18191b] shrink-0 border-b border-[#2a2b2e]">
         <img src={Logo} alt="Logo" className="w-[20px] h-[20px] object-contain" />
         <div className="flex items-center gap-3 ml-auto">
           <div className="flex items-center gap-[5px]">
@@ -47,63 +77,44 @@ function StreamPanel() {
       <div className="relative flex-1 overflow-hidden">
         <div
           ref={scrollRef}
-          className="overflow-y-auto px-4 py-3 space-y-3"
+          className="overflow-y-auto px-4 py-3 space-y-4"
           style={{ maxHeight: 460, scrollbarWidth: "thin", scrollbarColor: "#61656b transparent" }}
         >
-          {/* User message */}
-          {userQuery && (
-            <div className="flex justify-end">
-              <div className="bg-[#2a2b2e] rounded-[10px] rounded-tr-[3px] px-3 py-2 max-w-[85%]">
-                <p className="text-[#c4c4c4] text-[13px] leading-[1.4]">{userQuery}</p>
+          {messages.map((msg, i) => (
+            <div key={i} className="space-y-2">
+              {/* User bubble */}
+              <div className="flex justify-end">
+                <div className="bg-[#2a2b2e] rounded-[10px] rounded-tr-[3px] px-3 py-2 max-w-[85%]">
+                  <p className="text-[#c4c4c4] text-[13px] leading-[1.4]">{msg.query}</p>
+                </div>
               </div>
-            </div>
-          )}
 
-          {/* AI response */}
-          {streamedText ? (
-            <div className="flex justify-start">
-              <div className="max-w-full">
-                <div className="text-white text-[14px] leading-[1.55]">
-                  <ReactMarkdown
-                    components={{
-                      p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
-                      h1: ({ children }) => <h1 className="text-[16px] font-bold mb-2">{children}</h1>,
-                      h2: ({ children }) => <h2 className="text-[15px] font-semibold mb-2">{children}</h2>,
-                      h3: ({ children }) => <h3 className="text-[14px] font-semibold mb-1">{children}</h3>,
-                      ul: ({ children }) => <ul className="list-disc pl-4 mb-2">{children}</ul>,
-                      ol: ({ children }) => <ol className="list-decimal pl-4 mb-2">{children}</ol>,
-                      li: ({ children }) => <li className="mb-0.5">{children}</li>,
-                      code: ({ children, className }) =>
-                        className ? (
-                          <code className="block bg-[#0d0e0f] rounded-[6px] px-3 py-2 text-[13px] font-mono overflow-x-auto mb-2">{children}</code>
-                        ) : (
-                          <code className="bg-[#0d0e0f] rounded-[3px] px-1 text-[13px] font-mono">{children}</code>
-                        ),
-                      pre: ({ children }) => <pre className="mb-2">{children}</pre>,
-                      strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-                      em: ({ children }) => <em className="italic">{children}</em>,
-                      blockquote: ({ children }) => (
-                        <blockquote className="border-l-2 border-[#61656b] pl-3 text-[#9ca3af] mb-2">{children}</blockquote>
-                      ),
-                    }}
-                  >
-                    {streamedText}
-                  </ReactMarkdown>
+              {/* AI response */}
+              {msg.response ? (
+                <div className="flex justify-start">
+                  <div className="text-white text-[14px] leading-[1.55] max-w-full">
+                    <ReactMarkdown components={mdComponents}>{msg.response}</ReactMarkdown>
+                  </div>
                 </div>
-              </div>
-            </div>
-          ) : userQuery ? (
-            <div className="flex justify-start">
-              <div className="flex items-center gap-2">
-                <div className="flex gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#61656b] animate-bounce [animation-delay:0ms]" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#61656b] animate-bounce [animation-delay:150ms]" />
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#61656b] animate-bounce [animation-delay:300ms]" />
+              ) : i === messages.length - 1 && isLastStreaming ? (
+                <div className="flex justify-start">
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#61656b] animate-bounce [animation-delay:0ms]" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#61656b] animate-bounce [animation-delay:150ms]" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#61656b] animate-bounce [animation-delay:300ms]" />
+                    </div>
+                    <span className="text-[#61656b] text-[13px]">Thinking...</span>
+                  </div>
                 </div>
-                <span className="text-[#61656b] text-[13px]">Thinking...</span>
-              </div>
+              ) : null}
+
+              {/* Divider between messages */}
+              {i < messages.length - 1 && (
+                <div className="border-t border-[#2a2b2e] pt-1" />
+              )}
             </div>
-          ) : null}
+          ))}
         </div>
 
         {/* Bottom gradient fade */}
